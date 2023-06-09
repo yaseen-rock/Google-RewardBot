@@ -118,7 +118,7 @@ resource "aws_ecs_service" "test-service-node-main" {
 }
 
 data "aws_ecr_repository" "example" {
-  name = "node"
+  name = "<changeme>"
 }
 # data "aws_ecr_image" "service_image" {
 #   repository_name = "node"
