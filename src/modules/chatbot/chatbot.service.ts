@@ -55,9 +55,9 @@ export class ChatbotService {
         case 2: // /help
           data = {
             text: `Example: *@Optimus Reward Bot +5 @visaga for helping me launch a marketing campaign so that we can generate new business #teamwork*
-                     Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
-                     You can give to users: Annie, Barko, Bear, Blue, Bonusly, Fig, Maple, Moose, Pepper, Sven and 2 more. 
-                     You have 75 points to give.`,
+Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
+You can give to users: Annie, Barko, Bear, Blue, Bonusly, Fig, Maple, Moose, Pepper, Sven and 2 more. 
+You have 75 points to give.`,
           };
           //console.log('inside case 1');
           break;
@@ -112,11 +112,12 @@ export class ChatbotService {
     let rewardpt = this.calculateRewardPoint(text);
     let receiver = this.findReceiver(text);
     let senderPoint = 100 - rewardpt;
+
     let response: any = {
       text: `Example: *@Optimus Reward Bot +5 @visaga for helping me launch a marketing campaign so that we can generate new business #teamwork*
-                     Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
-                     You can give to users: Annie, Barko, Bear, Blue, Bonusly, Fig, Maple, Moose, Pepper, Sven and 2 more. 
-                     You have 75 points to give.`,
+Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
+You can give to users: Annie, Barko, Bear, Blue, Bonusly, Fig, Maple, Moose, Pepper, Sven and 2 more. 
+You have 75 points to give.`,
     };
 
     if (rewardpt !== null && receiver !== null) {
@@ -139,7 +140,7 @@ export class ChatbotService {
         widgets: [avatarWidget],
       };
 
-      response = {
+      return {
         cardsV2: [
           {
             cardId: 'avatarCard',
@@ -167,6 +168,7 @@ export class ChatbotService {
     } else {
       console.log('No match found.');
       return null;
+      return null;
     }
   }
 
@@ -180,6 +182,7 @@ export class ChatbotService {
       return receiver; // Output: abhineet
     } else {
       console.log('No match found.');
+      return null;
       return null;
     }
   }
