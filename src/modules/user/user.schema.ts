@@ -10,19 +10,19 @@ export class User extends Document {
     ref: 'Space',
     index: true,
   })
-  workspace: Types.ObjectId;
+  space: Types.ObjectId;
 
   @Prop()
   _id: string;
 
   @Prop()
-  name: string;
-
-  @Prop()
   displayName: string;
 
-  @Prop()
-  avatarUrl: string;
+  @Prop({ default: 100 })
+  credits: number;
+
+  @Prop({ default: 0 })
+  rewards: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
