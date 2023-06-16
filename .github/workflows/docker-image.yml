@@ -25,15 +25,6 @@ jobs:
       - name: "Checkout Code"
         uses: "actions/checkout@v2"
 
-      - name: Set env
-        run: |
-          secret_value=$(aws secretsmanager get-secret-value --region ap-south-1 --secret-id dev/optimus-reward-bot --query SecretString --output text)
-          #apt install jq -y
-          yaml_value=$(echo "$secret_value" | jq -r 'to_entries[] | "\(.key)= \(.value)"' | sed 's/^/  /')
-          yaml_value="$(echo -e "---\n$yaml_value")"
-          # Output the YAML value
-          echo "$yaml_value" > .env
-          #cat .env
 
       - name: Set tag
         id: vars
@@ -45,6 +36,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
+
+      - name: Set env
+        run: |
+          secret_value=$(aws secretsmanager get-secret-value --region ap-south-1 --secret-id dev/optimus-reward-bot --query SecretString --output text)
+          #apt install jq -y
+          yaml_value=$(echo "$secret_value" | jq -r 'to_entries[] | "\(.key)= \(.value)"' | sed 's/^/  /')
+          yaml_value="$(echo -e "---\n$yaml_value")"
+          # Output the YAML value
+          echo "$yaml_value" > .env
+          #cat .env
 
       - name: Login to Amazon ECR
         id: login-ecr
