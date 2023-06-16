@@ -3,10 +3,18 @@ name: "workflow"
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [ "main" ]
+    branches: [ main , ecsdeploy ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+env:
+  AWS_REGION: ap-south-1                  
+  ECR_REPOSITORY: optimus-reward-bot
+  ECS_SERVICE: testapp-service-node-main            
+  ECS_CLUSTER: node-cluster         
+  ECS_TASK_DEFINITION: my_node_test-main                                 
+  CONTAINER_NAME: testapp
 
 jobs:
   cd:
@@ -16,6 +24,16 @@ jobs:
     steps:
       - name: "Checkout Code"
         uses: "actions/checkout@v2"
+
+      - name: Set env
+        run: |
+          secret_value=$(aws secretsmanager get-secret-value --region ap-south-1 --secret-id dev/optimus-reward-bot --query SecretString --output text)
+          #apt install jq -y
+          yaml_value=$(echo "$secret_value" | jq -r 'to_entries[] | "\(.key)= \(.value)"' | sed 's/^/  /')
+          yaml_value="$(echo -e "---\n$yaml_value")"
+          # Output the YAML value
+          echo "$yaml_value" > .env
+          #cat .env
 
       - name: Set tag
         id: vars
@@ -36,7 +54,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: optimus-reward-bot
+          #ECR_REPOSITORY: optimus-reward-bot
           IMAGE_TAG: ${{ github.sha }}
         run: |
           echo $IMAGE_TAG
@@ -45,32 +63,57 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      - name: Terraform Init
+
+
+
+      - name: Download task definition
         run: |
-          cd terraform_with_ALB
-          terraform init
+            aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+
+
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v1
+      #   with:
+      #     cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      # - name: Terraform Init
+      #   run: |
+      #     cd terraform_with_ALB
+      #     terraform init
           
 
-      - name: Terraform Validate
-        id: validate
-        run: |
-          cd terraform_with_ALB          
-          terraform validate -no-color
+      # - name: Terraform Validate
+      #   id: validate
+      #   run: |
+      #     cd terraform_with_ALB          
+      #     terraform validate -no-color
               
-      - name: Terraform Plan
-        id: plan
-        run: |
-          cd terraform_with_ALB
-          terraform plan -no-color -input=false
-        continue-on-error: true
-      - name: Terraform Apply
-        run: |
-          cd terraform_with_ALB
-          terraform apply -auto-approve -input=false
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: |
+      #     cd terraform_with_ALB
+      #     terraform plan -no-color -input=false
+      #   continue-on-error: true
+      # - name: Terraform Apply
+      #   run: |
+      #     cd terraform_with_ALB
+      #     terraform apply -auto-approve -input=false
       # - name: Terraform destroy
       #   run: |
       #     cd terraform_with_ALB
