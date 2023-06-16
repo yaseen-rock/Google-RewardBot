@@ -39,7 +39,7 @@ jobs:
 
       - name: Set env
         run: |
-          secret_value=$(aws secretsmanager get-secret-value --region ap-south-1 --secret-id dev/optimus-reward-bot --query SecretString --output text)
+          secret_value=$(aws secretsmanager get-secret-value --region ap-south-1 --secret-id dev/optimus-reward-bot-v1 --query SecretString --output text)
           #apt install jq -y
           yaml_value=$(echo "$secret_value" | jq -r 'to_entries[] | "\(.key)= \(.value)"' | sed 's/^/  /')
           yaml_value="$(echo -e "---\n$yaml_value")"
