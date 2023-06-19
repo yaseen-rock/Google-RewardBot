@@ -11,6 +11,9 @@ export class Space extends Document {
 
   @Prop()
   name: string;
+
+  @Prop()
+  type: string;
 }
 
 export const SpaceSchema = SchemaFactory.createForClass(Space);
