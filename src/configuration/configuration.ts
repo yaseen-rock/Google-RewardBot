@@ -11,5 +11,7 @@ export default () => ({
     credential: process.env.GOOGLE_CREDENTIALS,
     client_email: process.env.CLIENT_EMAIL,
     private_key: process.env.CLIENT_PRIVATE_KEY,
+    encText: process.env.ENC_TEXT,
+    encKey: process.env.ENC_KEY,
   },
 });
