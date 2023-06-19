@@ -5,67 +5,38 @@ import { google } from 'googleapis';
 import { User } from 'src/interface/user';
 import { SpaceService } from '../space/space.service';
 import { UserService } from '../user/user.service';
+import { DecryptService } from 'src/shared/services/decryption.service';
 
 @Injectable()
 export class GoogleService {
+  encryptText: any;
   constructor(
     private _configService: ConfigService,
     private _spaceService: SpaceService,
     private _userService: UserService,
-  ) {}
+    private _decryptService: DecryptService,
+  ) {
+    this.encryptText = this._configService.get('google.encText');
+  }
 
   async authorize(scopes) {
-    // console.log('inside authorize');
-    let cred = this._configService.get('google.credential');
-    console.log('cred');
-    console.log(cred);
-    console.log(typeof cred);
-    let googleCred = JSON.parse(this._configService.get('google.credential'));
-
-    // console.log('googleCred');
-    // console.log(typeof googleCred);
-    // console.log(googleCred);
-
-    // let client_email = this._configService.get('google.client_email');
-
-    // console.log('clientemail');
-    // console.log(client_email);
-
-    // let private_key = this._configService
-    //   .get('google.private_key')
-    //   .split(String.raw`\n`)
-    //   .join('\n');
-    // console.log('privatekey');
-    // console.log(private_key);
+    //let googleCred = JSON.parse(this._configService.get('google.credential'));
 
     // let credentials = {
-    //   client_email: client_email,
-    //   private_key: private_key,
-    // };
+    //   client_email: googleCred.client_email,
+    //   private_key: googleCred.private_key,
+    // };;
+    // console.log('encrypt');
+    // let encryptText=
+    //   await this._decryptService.encrypt(JSON.stringify(credentials));
 
-    let credentials = {
-      client_email: googleCred.client_email,
-      private_key: googleCred.private_key,
-    };
-
-    // console.log('client email');
-    // console.log(typeof googleCred.client_email);
-    // console.log(googleCred.client_email);
-
-    // console.log('private key');
-    // console.log(typeof googleCred.private_key);
-    // console.log(googleCred.private_key);
-
-    console.log('credentials');
-    console.log(typeof credentials);
-    console.log(credentials);
-    console.log('scopes');
-
-    console.log(scopes);
+    let decryptText = JSON.parse(
+      await this._decryptService.decrypt(this.encryptText),
+    );
 
     let authClient = new google.auth.GoogleAuth({
       //keyFilename: './client_secret.json',
-      credentials: credentials,
+      credentials: decryptText,
       scopes: scopes,
     });
 
@@ -74,6 +45,7 @@ export class GoogleService {
     }
 
     return authClient;
+    //return null;
   }
 
   async getSpaceMembers(spaceId) {

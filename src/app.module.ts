@@ -10,6 +10,7 @@ import { LoggerModule } from 'nestjs-rollbar';
 import { SpaceModule } from './modules/space/space.module';
 import { UserModule } from './modules/user/user.module';
 import { GoogleModule } from './modules/google/google.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { GoogleModule } from './modules/google/google.module';
     SpaceModule,
     UserModule,
     GoogleModule,
+    SharedModule,
   ],
   controllers: [AppController, ChatbotController],
   providers: [AppService],
