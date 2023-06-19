@@ -104,9 +104,17 @@ You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven
           _id: req.body.space.name,
         });
         if (!space) {
+          let space = req.body.space;
+          let type =
+            space.spaceType == 'SPACE' && space.type == 'ROOM'
+              ? 'Space'
+              : space.spaceType == 'DIRECT_MESSAGE' && space.type == 'ROOM'
+              ? 'Group Chat'
+              : 'DM';
           let data = {
             _id: req.body.space.name,
             name: req.body.space.displayName,
+            type: type,
           };
           await this._spaceService.create(data);
         }
@@ -200,7 +208,7 @@ You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven
 
     let rewardpt = this.getRewardPoint(text);
     let receiver = this.getReceiver(text);
-    let senderPoint = 100 - rewardpt;
+    //let senderPoint = 100 - rewardpt;
 
     let response: any = {
       text: `You can send rewards to peers for their acheivement/appreciate them for helping you right from google chat
@@ -309,9 +317,23 @@ You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven
     let receiverName = this.getReceiver(text);
 
     let sender = await this._userService.findOne({ displayName: senderName });
+    console.log(sender);
+    if (!sender) {
+      await this._userService.create({
+        _id: req.body.message.sender.name,
+        space: req.body.message.space.name,
+        displayName: req.body.message.sender.displayName,
+      });
+      sender = await this._userService.findOne({ displayName: senderName });
+    }
+    console.log(sender);
     let receiver = await this._userService.findOne({
       displayName: receiverName,
     });
+    if (!receiver) {
+      await this._googleService.getSpaceMembers(req.body.message.space.name);
+      receiver = await this._userService.findOne({ displayName: receiverName });
+    }
 
     await this.updateCredit(sender, rewardpt);
     await this.updateReward(receiver, rewardpt);
