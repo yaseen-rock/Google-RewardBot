@@ -16,9 +16,10 @@ export class GoogleService {
 
   async authorize(scopes) {
     // console.log('inside authorize');
-    // let cred = this._configService.get('google.credential');
-    // console.log(cred);
-    // console.log(typeof cred);
+    let cred = this._configService.get('google.credential');
+    console.log('cred');
+    console.log(cred);
+    console.log(typeof cred);
     let googleCred = JSON.parse(this._configService.get('google.credential'));
 
     // console.log('googleCred');
