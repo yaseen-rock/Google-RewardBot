@@ -97,23 +97,23 @@ jobs:
       - name: Terraform Init
         id: init 
         run: terraform init
-        working-directory: ./terraform/optimus-stg-ecs
+        working-directory: ./terraform/ecs-stg
       - name: Terraform state
         id: state
         run: terraform state rm aws_ecs_task_definition.service
             #continue-on-error: true
-        working-directory: ./terraform/optimus-stg-ecs
+        working-directory: ./terraform/ecs-stg
 
           
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ./terraform/optimus-stg-ecs              
+        working-directory: ./terraform/ecs-stg              
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false 
             #continue-on-error: true
-        working-directory: ./terraform/optimus-stg-ecs
+        working-directory: ./terraform/ecs-stg
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false 
         working-directory: ./terraform/1851-dev-ecs
