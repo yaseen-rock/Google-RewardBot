@@ -1,18 +1,18 @@
 name: Deploy to Amazon ECS PROD
 
 on:
-  # push:
-  #   branches:
-  #     - ecsstg
-  #     - main
+  push:
+    branches:
+      - ecsstg
+      - main
   workflow_dispatch:
 
 env:
   AWS_REGION: us-east-1                  
-  ECR_REPOSITORY: rewards-bot-stg
-  ECS_SERVICE: optimus-staging            
-  ECS_CLUSTER: optimus-staging         
-  ECS_TASK_DEFINITION: optimus-staging                                 
+  ECR_REPOSITORY: rewards-bot-prod
+  ECS_SERVICE: optimus-production            
+  ECS_CLUSTER: optimus-production           
+  ECS_TASK_DEFINITION: optimus-production                                  
   CONTAINER_NAME: optimus
 
                                     
@@ -37,7 +37,7 @@ jobs:
 
       - name: Set env
         run: |
-          secret_value=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id stg/reward-bot/backend --query SecretString --output text)
+          secret_value=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id prod/reward-bot/backend --query SecretString --output text)
           #apt install jq -y
           yaml_value=$(echo "$secret_value" | jq -r 'to_entries[] | "\(.key)= \(.value)"' | sed 's/^/  /')
           yaml_value="$(echo -e "---\n$yaml_value")"
@@ -59,7 +59,7 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          sed -i "s|<changeme>|$IMAGE_TAG|g" ./terraform/ecs-stg/ecs-service.tf
+          sed -i "s|<changeme>|$IMAGE_TAG|g" ./terraform/ecs-prod/ecs-service.tf
           docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
@@ -97,23 +97,23 @@ jobs:
       - name: Terraform Init
         id: init 
         run: terraform init
-        working-directory: ./terraform/ecs-stg
+        working-directory: ./terraform/ecs-prod
       - name: Terraform state
         id: state
         run: terraform state rm aws_ecs_task_definition.service
         continue-on-error: true
-        working-directory: ./terraform/ecs-stg
+        working-directory: ./terraform/ecs-prod
 
           
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ./terraform/ecs-stg              
+        working-directory: ./terraform/ecs-prod              
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false 
             #continue-on-error: true
-        working-directory: ./terraform/ecs-stg
+        working-directory: ./terraform/ecs-prod
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false 
-        working-directory: ./terraform/ecs-stg
+        working-directory: ./terraform/ecs-prod
