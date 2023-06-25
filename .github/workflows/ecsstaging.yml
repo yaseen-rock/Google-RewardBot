@@ -101,7 +101,7 @@ jobs:
       - name: Terraform state
         id: state
         run: terraform state rm aws_ecs_task_definition.service
-            #continue-on-error: true
+        continue-on-error: true
         working-directory: ./terraform/ecs-stg
 
           
