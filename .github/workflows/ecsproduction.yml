@@ -1,10 +1,10 @@
 name: Deploy to Amazon ECS PROD
 
 on:
-  push:
-    branches:
-      - ecsstg
-      - main
+  # push:
+  #   branches:
+  #     - ecsstg
+  #     - main
   workflow_dispatch:
 
 env:
