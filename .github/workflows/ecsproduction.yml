@@ -31,8 +31,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Set env
@@ -59,7 +59,7 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          sed -i "s|<changeme>|$IMAGE_TAG|g" ./terraform/optimus-ecs-stg/ecs-service.tf
+          sed -i "s|<changeme>|$IMAGE_TAG|g" ./terraform/ecs-stg/ecs-service.tf
           docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
@@ -97,23 +97,23 @@ jobs:
       - name: Terraform Init
         id: init 
         run: terraform init
-        working-directory: ./terraform/optimus-stg-ecs
+        working-directory: ./terraform/ecs-stg
       - name: Terraform state
         id: state
         run: terraform state rm aws_ecs_task_definition.service
-            #continue-on-error: true
-        working-directory: ./terraform/optimus-stg-ecs
+        continue-on-error: true
+        working-directory: ./terraform/ecs-stg
 
           
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ./terraform/optimus-stg-ecs              
+        working-directory: ./terraform/ecs-stg              
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false 
             #continue-on-error: true
-        working-directory: ./terraform/optimus-stg-ecs
+        working-directory: ./terraform/ecs-stg
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false 
-        working-directory: ./terraform/1851-dev-ecs
+        working-directory: ./terraform/ecs-stg
