@@ -116,4 +116,4 @@ jobs:
         working-directory: ./terraform/ecs-stg
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false 
-        working-directory: ./terraform/1851-dev-ecs
+        working-directory: ./terraform/ecs-stg
