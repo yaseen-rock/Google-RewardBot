@@ -65,55 +65,55 @@ jobs:
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           #echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Download task definition
-        run: |
-            aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+      # - name: Download task definition
+      #   run: |
+      #       aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
 
 
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
-
-
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
-
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v1
+      # - name: Fill in the new image ID in the Amazon ECS task definition
+      #   id: task-def
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
       #   with:
-      #     terraform_version: 1.3.2
-      #       # cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      #     task-definition: task-definition.json
+      #     container-name: ${{ env.CONTAINER_NAME }}
+      #     image: ${{ steps.build-image.outputs.image }}
 
-      # - name: Terraform Init
-      #   id: init 
-      #   run: terraform init
-      #   working-directory: ./terraform/ecs-stg
-      # - name: Terraform state
-      #   id: state
-      #   run: terraform state rm aws_ecs_task_definition.service
-      #   continue-on-error: true
-      #   working-directory: ./terraform/ecs-stg
+
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.3.2
+            # cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Init
+        id: init 
+        run: terraform init
+        working-directory: ./terraform/ecs-stg
+      - name: Terraform state
+        id: state
+        run: terraform state rm aws_ecs_task_definition.service
+        continue-on-error: true
+        working-directory: ./terraform/ecs-stg
 
           
-      # - name: Terraform Validate
-      #   id: validate
-      #   run: terraform validate -no-color
-      #   working-directory: ./terraform/ecs-stg              
-      # - name: Terraform Plan
-      #   id: plan
-      #   run: terraform plan -no-color -input=false 
-      #       #continue-on-error: true
-      #   working-directory: ./terraform/ecs-stg
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve -input=false 
-      #   working-directory: ./terraform/ecs-stg
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: ./terraform/ecs-stg              
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false 
+            #continue-on-error: true
+        working-directory: ./terraform/ecs-stg
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false 
+        working-directory: ./terraform/ecs-stg

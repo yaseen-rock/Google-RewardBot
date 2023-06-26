@@ -27,7 +27,7 @@ resource "aws_lb_listener_rule" "static" {
 
   condition {
     host_header {
-      values = ["rewards-bot.stg.${var.domain_name}"]
+      values = ["rewards-bot-stg.${var.domain_name}"]
     }
   }
 }

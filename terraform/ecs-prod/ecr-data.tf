@@ -3,7 +3,7 @@
 # }
 
 data "aws_ecr_repository" "optimus" {
-  name = "rewards-bot-stg"
+  name = "rewards-bot-prod"
 }
 
 # data "aws_ecr_repository" "redis" {
