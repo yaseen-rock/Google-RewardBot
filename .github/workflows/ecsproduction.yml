@@ -21,7 +21,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
 
     steps:
       - name: Checkout
@@ -112,7 +112,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false 
-            #continue-on-error: true
+        #continue-on-error: true
         working-directory: ./terraform/ecs-prod
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false 
