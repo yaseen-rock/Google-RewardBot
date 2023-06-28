@@ -114,6 +114,6 @@ jobs:
         run: terraform plan -no-color -input=false 
             #continue-on-error: true
         working-directory: ./terraform/ecs-stg
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve -input=false 
-      #   working-directory: ./terraform/ecs-stg
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false 
+        working-directory: ./terraform/ecs-stg
