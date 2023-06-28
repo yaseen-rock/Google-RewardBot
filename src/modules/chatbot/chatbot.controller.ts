@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { ChatbotService } from './chatbot.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('message')
 export class ChatbotController {

@@ -64,13 +64,13 @@ export class ChatbotService {
             case 2: // /help
               data = {
                 text: `You can send rewards to peers for their acheivement/appreciate them for helping you right from google chat
-Example: *@Optimus Reward Bot +5 @visaga for helping me launch a marketing campaign so that we can generate new business #teamwork*
+Example: *@Rewards Bot +5 @john for helping me launch a marketing campaign so that we can generate new business #teamwork*
 Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
 You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven and 2 more. 
  
 *Available commands:*
     /mypoint - To get your current credits and rewards
-    /redeem <reward_point> - To Send Redeem request `,
+    /redeem  - To send Redeem request `,
               };
               //console.log('inside case 1');
               break;
@@ -212,13 +212,13 @@ You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven
 
     let response: any = {
       text: `You can send rewards to peers for their acheivement/appreciate them for helping you right from google chat
-Example: *@Optimus Reward Bot +5 @visaga for helping me launch a marketing campaign so that we can generate new business #teamwork*
+Example: *@Rewards Bot +5 @john for helping me launch a marketing campaign so that we can generate new business #teamwork*
 Suggested hashtags are: #teamwork, #leadership, #problem-solving, #innovation, #customer-service, #vision, #your-company-values-here, and #wellness-at-work.  
 You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven and 2 more. 
        
 *Available commands:*
           /mypoint - To get your current credits and rewards
-          /redeem <reward_point> - To Send Redeem request `,
+          /redeem  - To send Redeem request `,
     };
 
     if (rewardpt !== null && receiver !== null) {
@@ -293,8 +293,8 @@ You can give to users: Annie, Barko, Bear, Blue, Fig, Maple, Moose, Pepper, Sven
       text: `
       Your Giveable credits for this month: *${userDetails.credits}*
       Your redeemable reward point: *${userDetails.rewards}*
-      You can send redeem request using /redeem <reward_point>
-      _Eg: /redeem 100_`,
+      You can send redeem request using /redeem 
+      _Eg: /redeem_`,
     };
   }
 
