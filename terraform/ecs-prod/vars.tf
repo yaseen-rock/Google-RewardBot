@@ -24,7 +24,7 @@ variable "source_branch_name" {
 }
 
 variable "domain_name" {
-  default = "opedsandbox.info"
+  default = "active-steps-app.com"
 }
 # variable "cloudflare_zone_id" {}
 
