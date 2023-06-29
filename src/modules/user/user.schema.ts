@@ -18,6 +18,9 @@ export class User extends Document {
   @Prop()
   displayName: string;
 
+  @Prop()
+  email: string;
+
   @Prop({ default: 100 })
   credits: number;
 
