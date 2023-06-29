@@ -24,7 +24,7 @@ variable "source_branch_name" {
 }
 
 variable "domain_name" {
-  default = "active-steps-app.com"
+  default = "rewards-bot.active-steps.com"
 }
 # variable "cloudflare_zone_id" {}
 
