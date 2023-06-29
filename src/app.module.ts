@@ -29,6 +29,7 @@ import { SharedModule } from './shared/shared.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         accessToken: configService.get('rollbar.accessToken'),
+        environment: configService.get('rollbar.environment'),
         captureUncaught: true,
         captureUnhandledRejections: true,
         ignoreDuplicateErrors: false,

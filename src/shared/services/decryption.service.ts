@@ -10,20 +10,20 @@ export class DecryptService {
   }
 
   //Encrypt the text
-  encrypt(text) {
-    const key = crypto.createHash('sha256').update(this.encKey).digest('hex');
-    let cipher = crypto.createCipheriv(
-      'aes-256-cbc',
-      Buffer.from(key, 'hex'),
-      Buffer.alloc(16),
-    );
+  // encrypt(text) {
+  //   const key = crypto.createHash('sha256').update(this.encKey).digest('hex');
+  //   let cipher = crypto.createCipheriv(
+  //     'aes-256-cbc',
+  //     Buffer.from(key, 'hex'),
+  //     Buffer.alloc(16),
+  //   );
 
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    console.log('--------------------Encrypted---------------------');
-    console.log(encrypted.toString('base64'));
-    return encrypted.toString('base64');
-  }
+  //   let encrypted = cipher.update(text);
+  //   encrypted = Buffer.concat([encrypted, cipher.final()]);
+  //   console.log('--------------------Encrypted---------------------');
+  //   console.log(encrypted.toString('base64'));
+  //   return encrypted.toString('base64');
+  // }
 
   decrypt(text) {
     const key = crypto.createHash('sha256').update(this.encKey).digest('hex');

@@ -6,6 +6,7 @@ import { User } from 'src/interface/user';
 import { SpaceService } from '../space/space.service';
 import { UserService } from '../user/user.service';
 import { DecryptService } from 'src/shared/services/decryption.service';
+import { RollbarLogger } from 'nestjs-rollbar';
 
 @Injectable()
 export class GoogleService {
@@ -15,6 +16,7 @@ export class GoogleService {
     private _spaceService: SpaceService,
     private _userService: UserService,
     private _decryptService: DecryptService,
+    private _rollbarLogger: RollbarLogger,
   ) {
     this.encryptText = this._configService.get('google.encText');
   }
@@ -41,11 +43,27 @@ export class GoogleService {
     });
 
     if (authClient == null) {
+      this._rollbarLogger.error('authentication failed');
       throw Error('authentication failed');
     }
 
     return authClient;
-    //return null;
+  }
+
+  async deleteMessage(messageId) {
+    let chatScope = [
+      'https://www.googleapis.com/auth/chat.bot',
+      'https://www.googleapis.com/auth/chat.messages',
+    ];
+    const auth = await this.authorize(chatScope);
+
+    const chat = google.chat({ version: 'v1', auth });
+
+    // let createMessageResponse = await chat.message.create({});
+    let data = await chat.spaces.messages.delete({
+      name: messageId,
+    });
+    console.log(data);
   }
 
   async getSpaceMembers(spaceId) {
@@ -54,19 +72,17 @@ export class GoogleService {
       'https://www.googleapis.com/auth/chat.memberships',
     ];
     const auth = await this.authorize(chatScope);
-    //console.log(auth);
+
     const chat = google.chat({ version: 'v1', auth });
-    //console.log(chat);
 
     // let createMessageResponse = await chat.message.create({});
     let { data } = await chat.spaces.members.list({
       parent: spaceId,
     });
-    console.log(data);
+
     let memberships = data.memberships;
     let members = [];
     memberships.map((membership) => members.push(membership.member));
-    console.log(members);
 
     let space = await this._spaceService.findOne({ _id: spaceId });
 
@@ -106,8 +122,6 @@ export class GoogleService {
     //let peopleScope = ['https://www.googleapis.com/auth/contacts.readonly'];
 
     // const auth = await this.authorize(adminScope);
-    // console.log('auth');
-    // console.log(auth);
 
     const admin = google.admin({
       version: 'directory_v1',
