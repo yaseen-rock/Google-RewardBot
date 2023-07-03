@@ -89,9 +89,11 @@ export class GoogleService {
     for (let member of members) {
       let user = await this._userService.findOne({ _id: member.name });
       if (!user) {
-        let data: User = {
+        let email = await this.getUserEmail(member.name.split('/')[1]);
+        let data = {
           space: space._id,
           _id: member.name,
+          email: email,
           displayName: member.displayName,
         };
         await this._userService.create(data);
@@ -102,39 +104,21 @@ export class GoogleService {
   async getUserEmail(userId: string) {
     let adminScope = [
       'https://www.googleapis.com/auth/admin.directory.user',
-      'https://www.googleapis.com/auth/admin.directory.user.readonly',
+      'https://www.googleapis.com/auth/userinfo.email',
     ];
 
-    let googleCred = JSON.parse(this._configService.get('google.credential'));
-
-    let credentials = {
-      client_email: googleCred.client_email,
-      private_key: googleCred.private_key,
-    };
-
-    console.log(credentials);
-
-    let authClient = await google.auth.getClient({
-      credentials: credentials,
-      scopes: adminScope,
-    });
-
-    //let peopleScope = ['https://www.googleapis.com/auth/contacts.readonly'];
-
-    // const auth = await this.authorize(adminScope);
+    const auth = await this.authorize(adminScope);
 
     const admin = google.admin({
       version: 'directory_v1',
-      auth: authClient,
+      auth: auth,
     });
-
-    console.log(admin);
-    // const people = google.people({ version: 'v1', auth });
 
     let response = await admin.users.get({
       userKey: userId,
     });
 
-    console.log(response);
+    console.log(response.data);
+    return response.data.primaryEmail;
   }
 }

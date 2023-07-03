@@ -22,6 +22,7 @@ export class ChatbotService {
   ) {}
   async getResponse(req, res) {
     let data;
+    console.log(req.body);
     let { message, type } = req.body;
     this._rollbarLogger.info(`Event Type: ${type}`);
     this._rollbarLogger.info(`Message: ${JSON.stringify(message)}`);
