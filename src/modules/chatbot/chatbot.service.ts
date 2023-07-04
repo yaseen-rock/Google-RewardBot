@@ -6,11 +6,13 @@ import { helpCard } from 'src/cards/help';
 import { addToChatCard } from 'src/cards/add-to-chat';
 import { validationText } from 'src/cards/validation-text';
 import { welcomeCard } from 'src/cards/welcome-card';
+import { welcomeDMCard } from 'src/cards/welcome-dm-card';
 import { redeemText } from 'src/cards/redeem-text';
 import { noSlashCommandText } from 'src/cards/no-slash-command';
 import { rewardsCard } from 'src/cards/rewards-card';
 import { myPointsCard } from 'src/cards/mypoints-card';
 import { RollbarLogger } from 'nestjs-rollbar';
+import { tourCard1 } from 'src/cards/tour-card-1';
 
 @Injectable()
 export class ChatbotService {
@@ -41,6 +43,13 @@ export class ChatbotService {
         this._rollbarLogger.info(`Bot Response: ${JSON.stringify(data)}`);
         res.send(data);
         break;
+      case 'CARD_CLICKED':
+        data = await this.processCardClickedEvent(req.body);
+        this._rollbarLogger.info(`Bot Response: ${JSON.stringify(data)}`);
+        console.log('Response received');
+        console.log(data);
+        res.send(data);
+        break;
       default:
         break;
     }
@@ -66,11 +75,17 @@ export class ChatbotService {
         type: type,
       };
       await this._spaceService.create(data);
+      space = await this._spaceService.findOne({
+        _id: req.body.space.name,
+      });
     }
     await this._googleService.getSpaceMembers(req.body.space.name);
 
-    let card = welcomeCard();
-    console.log(card);
+    let card: any = welcomeCard();
+    if (space.type == 'DM') {
+      card = welcomeDMCard(req.body.user.displayName);
+    }
+    console.log(JSON.stringify(card));
     return card;
   }
   async processSlashCommand(req): Promise<any> {
@@ -229,5 +244,30 @@ export class ChatbotService {
     await this._userService.findByIdAndUpdate(receiver._id, {
       rewards: rewards,
     });
+  }
+
+  async processCardClickedEvent(reqBody) {
+    const { space, user, action } = reqBody;
+    console.log(action);
+    let card;
+    if (space.type == 'DM' && action.actionMethodName == 'getTourCard') {
+      switch (action.parameters[0].value) {
+        case '1':
+          card = tourCard1();
+          console.log('inside case 1');
+          console.log(card);
+
+          break;
+        // case '2':
+        //   card=tourCard2();
+        //   break;
+        // case '3':
+        //   card=tourCard3();
+        //   break;
+        default:
+          break;
+      }
+    }
+    return card;
   }
 }
