@@ -229,7 +229,7 @@ export class ChatbotService {
       return {
         status: 'fail',
         error:
-          "Sorry! Your don't have enough credit points to send rewards.Please check your available credits by sending /mypoint from your DM",
+          "Sorry! You don't have sufficient credit points to send rewards. Please check your available credits by sending /mypoint in the direct chat with bot.",
       };
     }
   }
