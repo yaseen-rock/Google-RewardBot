@@ -106,11 +106,19 @@ export class ChatbotService {
       let messageId = message.name;
 
       //await this._googleService.deleteMessage(messageId);
-      await this.calculateRewardPoint(req);
-      const sender = req.body.message.sender.displayName;
-      const image = req.body.message.sender.avatarUrl;
-      const text = req.body.message.argumentText;
-      data = this.createMessage(text, sender);
+
+      const response = await this.calculateRewardPoint(req);
+
+      if (!response?.error) {
+        const sender = req.body.message.sender.displayName;
+        const image = req.body.message.sender.avatarUrl;
+        const text = req.body.message.argumentText;
+        data = this.createMessage(text, sender);
+      } else {
+        data = {
+          text: response.error,
+        };
+      }
     } else {
       data = validationText();
     }
@@ -186,16 +194,29 @@ export class ChatbotService {
       });
       sender = await this._userService.findOne({ displayName: senderName });
     }
-    let receiver = await this._userService.findOne({
-      displayName: receiverName,
-    });
-    if (!receiver) {
-      await this._googleService.getSpaceMembers(req.body.message.space.name);
-      receiver = await this._userService.findOne({ displayName: receiverName });
-    }
+    if (sender.credits >= rewardpt) {
+      let receiver = await this._userService.findOne({
+        displayName: receiverName,
+      });
+      if (!receiver) {
+        await this._googleService.getSpaceMembers(req.body.message.space.name);
+        receiver = await this._userService.findOne({
+          displayName: receiverName,
+        });
+      }
 
-    await this.updateCredit(sender, rewardpt);
-    await this.updateReward(receiver, rewardpt);
+      await this.updateCredit(sender, rewardpt);
+      await this.updateReward(receiver, rewardpt);
+      return {
+        status: 'success',
+      };
+    } else {
+      return {
+        status: 'fail',
+        error:
+          "Sorry! Your don't have enough credit points to send rewards.Please check your available credits by sending /mypoint from your DM",
+      };
+    }
   }
 
   async updateCredit(sender, rewardSent) {
