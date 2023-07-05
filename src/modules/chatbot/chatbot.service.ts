@@ -6,11 +6,19 @@ import { helpCard } from 'src/cards/help';
 import { addToChatCard } from 'src/cards/add-to-chat';
 import { validationText } from 'src/cards/validation-text';
 import { welcomeCard } from 'src/cards/welcome-card';
+import { welcomeDMCard } from 'src/cards/welcome-dm-card';
 import { redeemText } from 'src/cards/redeem-text';
 import { noSlashCommandText } from 'src/cards/no-slash-command';
 import { rewardsCard } from 'src/cards/rewards-card';
 import { myPointsCard } from 'src/cards/mypoints-card';
 import { RollbarLogger } from 'nestjs-rollbar';
+import { tourCard1 } from 'src/cards/tour-card-1';
+import { tourCard2 } from 'src/cards/tour-card-2';
+import { tourCard3 } from 'src/cards/tour-card-3';
+import { tourCard4 } from 'src/cards/tour-card-4';
+import { getUserFeedbackCard as getUserFeedbackDialog } from 'src/cards/get-user-feedback-dialog';
+import { getThanksMessageDialog } from 'src/cards/get-thanks-message-dialog';
+import { FeedbackService } from '../feedback/feedback.service';
 
 @Injectable()
 export class ChatbotService {
@@ -18,6 +26,7 @@ export class ChatbotService {
     private _googleService: GoogleService,
     private _spaceService: SpaceService,
     private _userService: UserService,
+    private _feedbackService: FeedbackService,
     private _rollbarLogger: RollbarLogger,
   ) {}
   async getResponse(req, res) {
@@ -39,6 +48,13 @@ export class ChatbotService {
       case 'ADDED_TO_SPACE':
         data = await this.processAddToSpaceEvent(req);
         this._rollbarLogger.info(`Bot Response: ${JSON.stringify(data)}`);
+        res.send(data);
+        break;
+      case 'CARD_CLICKED':
+        data = await this.processCardClickedEvent(req.body);
+        this._rollbarLogger.info(`Bot Response: ${JSON.stringify(data)}`);
+        console.log('Response received');
+        console.log(data);
         res.send(data);
         break;
       default:
@@ -66,11 +82,17 @@ export class ChatbotService {
         type: type,
       };
       await this._spaceService.create(data);
+      space = await this._spaceService.findOne({
+        _id: req.body.space.name,
+      });
     }
     await this._googleService.getSpaceMembers(req.body.space.name);
 
-    let card = welcomeCard();
-    console.log(card);
+    let card: any = welcomeCard();
+    if (space.type == 'DM') {
+      card = welcomeDMCard(req.body.user.displayName);
+    }
+    console.log(JSON.stringify(card));
     return card;
   }
   async processSlashCommand(req): Promise<any> {
@@ -229,5 +251,60 @@ export class ChatbotService {
     await this._userService.findByIdAndUpdate(receiver._id, {
       rewards: rewards,
     });
+  }
+
+  async processCardClickedEvent(reqBody) {
+    const { space, user, action } = reqBody;
+    console.log(action);
+    let card;
+    if (space.type == 'DM' && action?.actionMethodName == 'getTourCard') {
+      switch (action.parameters[0].value) {
+        case '1':
+          card = tourCard1();
+          break;
+        case '2':
+          card = tourCard2();
+          break;
+        case '3':
+          card = tourCard3();
+          break;
+        case '4':
+          card = tourCard4();
+          break;
+        // case '5':
+        //   card = getUserFeedbackCard();
+        //   break;
+        default:
+          break;
+      }
+    } else if (
+      space.type == 'DM' &&
+      action?.actionMethodName == 'getUserFeedback'
+    ) {
+      card = getUserFeedbackDialog();
+    } else if (
+      space.type == 'DM' &&
+      action?.actionMethodName == 'saveFeedback'
+    ) {
+      let userId = reqBody.user.name;
+      let user = await this._userService.findOne({ _id: userId });
+      let userFeedback =
+        reqBody.common.formInputs.feedback.stringInputs.value[0];
+
+      if (user) {
+        console.log('inside savefeedback');
+        let response = await this._feedbackService.create({
+          user: user._id,
+          feedback: userFeedback,
+        });
+
+        console.log(response);
+      }
+
+      card = getThanksMessageDialog();
+    } else {
+      card = null;
+    }
+    return card;
   }
 }
