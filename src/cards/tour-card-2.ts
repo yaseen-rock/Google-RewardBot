@@ -1,20 +1,18 @@
-export function tourCard1() {
+export function tourCard2() {
   const cardHeader = {
-    title: `How to Send Rewards to Peers?`,
+    title: `How to check your Credit/Reward points?`,
   };
 
   const avatarWidget = {
     textParagraph: {
-      text: `Now you can send rewards to your peers from spaces<br>
-      Go to spaces where your peer is in and send the Appreciation/Recognization Command<br>
-      <text><font color=\"#0000ff\"><b>Eg @Rewards Bot @john Doe +10 for helping in brainstorming the business ideas #teamwork</b></text>`,
+      text: `You can check your reward points by sending /mypoint command from your direct message with bot`,
     },
   };
 
   const imageWidget = {
     image: {
-      imageUrl: 'https://i.imgur.com/MtZwitR.png',
-      altText: 'send-rewards-to-peers',
+      imageUrl: 'https://i.imgur.com/KgGvu6g.png',
+      altText: 'check-available-credits-rewards',
     },
   };
 
@@ -35,7 +33,7 @@ export function tourCard1() {
               parameters: [
                 {
                   key: 'cardNumber',
-                  value: 2,
+                  value: 3,
                 },
               ],
             },
@@ -74,9 +72,9 @@ export function tourCard1() {
   let cardData = {
     cardsV2: [
       {
-        cardId: 'Tour Card 1',
+        cardId: 'Tour Card 2',
         card: {
-          name: 'Tour Card 1',
+          name: 'Tour Card 2',
           header: cardHeader,
           sections: [avatarSection],
         },

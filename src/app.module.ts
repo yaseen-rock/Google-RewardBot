@@ -11,6 +11,7 @@ import { SpaceModule } from './modules/space/space.module';
 import { UserModule } from './modules/user/user.module';
 import { GoogleModule } from './modules/google/google.module';
 import { SharedModule } from './shared/shared.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SharedModule } from './shared/shared.module';
     UserModule,
     GoogleModule,
     SharedModule,
+    FeedbackModule,
   ],
   controllers: [AppController, ChatbotController],
   providers: [AppService],

@@ -13,6 +13,12 @@ import { rewardsCard } from 'src/cards/rewards-card';
 import { myPointsCard } from 'src/cards/mypoints-card';
 import { RollbarLogger } from 'nestjs-rollbar';
 import { tourCard1 } from 'src/cards/tour-card-1';
+import { tourCard2 } from 'src/cards/tour-card-2';
+import { tourCard3 } from 'src/cards/tour-card-3';
+import { tourCard4 } from 'src/cards/tour-card-4';
+import { getUserFeedbackCard as getUserFeedbackDialog } from 'src/cards/get-user-feedback-dialog';
+import { getThanksMessageDialog } from 'src/cards/get-thanks-message-dialog';
+import { FeedbackService } from '../feedback/feedback.service';
 
 @Injectable()
 export class ChatbotService {
@@ -20,6 +26,7 @@ export class ChatbotService {
     private _googleService: GoogleService,
     private _spaceService: SpaceService,
     private _userService: UserService,
+    private _feedbackService: FeedbackService,
     private _rollbarLogger: RollbarLogger,
   ) {}
   async getResponse(req, res) {
@@ -250,23 +257,53 @@ export class ChatbotService {
     const { space, user, action } = reqBody;
     console.log(action);
     let card;
-    if (space.type == 'DM' && action.actionMethodName == 'getTourCard') {
+    if (space.type == 'DM' && action?.actionMethodName == 'getTourCard') {
       switch (action.parameters[0].value) {
         case '1':
           card = tourCard1();
-          console.log('inside case 1');
-          console.log(card);
-
           break;
-        // case '2':
-        //   card=tourCard2();
-        //   break;
-        // case '3':
-        //   card=tourCard3();
+        case '2':
+          card = tourCard2();
+          break;
+        case '3':
+          card = tourCard3();
+          break;
+        case '4':
+          card = tourCard4();
+          break;
+        // case '5':
+        //   card = getUserFeedbackCard();
         //   break;
         default:
           break;
       }
+    } else if (
+      space.type == 'DM' &&
+      action?.actionMethodName == 'getUserFeedback'
+    ) {
+      card = getUserFeedbackDialog();
+    } else if (
+      space.type == 'DM' &&
+      action?.actionMethodName == 'saveFeedback'
+    ) {
+      let userId = reqBody.user.name;
+      let user = await this._userService.findOne({ _id: userId });
+      let userFeedback =
+        reqBody.common.formInputs.feedback.stringInputs.value[0];
+
+      if (user) {
+        console.log('inside savefeedback');
+        let response = await this._feedbackService.create({
+          user: user._id,
+          feedback: userFeedback,
+        });
+
+        console.log(response);
+      }
+
+      card = getThanksMessageDialog();
+    } else {
+      card = null;
     }
     return card;
   }
