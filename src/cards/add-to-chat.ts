@@ -1,7 +1,12 @@
 export function addToChatCard() {
   const imageWidget = {
     image: {
-      imageUrl: 'https://i.imgur.com/8cDlirX.png',
+      imageUrl: 'https://rewards-bot-images.s3.amazonaws.com/add-bot-to-dm.png',
+      onClick: {
+        openLink: {
+          url: 'https://rewards-bot-images.s3.amazonaws.com/add-bot-to-dm.png',
+        },
+      },
       altText: 'add-bot-to-chat',
     },
   };

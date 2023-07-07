@@ -307,4 +307,24 @@ export class ChatbotService {
     }
     return card;
   }
+
+  async sendMessage(req) {
+    let message = req.body.msg;
+    try {
+      return await this._googleService.createMessage(message);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async deleteMessage(req) {
+    // let message = req.body.msg;
+    try {
+      return await this._googleService.deleteMessage(
+        'spaces/t8FqEUAAAAE/messages/QUsOPEzjSZ0.QUsOPEzjSZ0',
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

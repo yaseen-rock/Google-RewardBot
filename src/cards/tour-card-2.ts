@@ -11,7 +11,12 @@ export function tourCard2() {
 
   const imageWidget = {
     image: {
-      imageUrl: 'https://i.imgur.com/KgGvu6g.png',
+      imageUrl: 'https://rewards-bot-images.s3.amazonaws.com/mypoint.png',
+      onClick: {
+        openLink: {
+          url: 'https://rewards-bot-images.s3.amazonaws.com/mypoint.png',
+        },
+      },
       altText: 'check-available-credits-rewards',
     },
   };
