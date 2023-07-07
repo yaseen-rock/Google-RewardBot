@@ -1,6 +1,6 @@
 export function tourCard3() {
   const cardHeader = {
-    title: `Send /help to get short text about what you can do with Rewards Bot`,
+    title: `Send /help anytime to know more`,
   };
 
   const avatarWidget = {
@@ -11,7 +11,12 @@ export function tourCard3() {
 
   const imageWidget = {
     image: {
-      imageUrl: 'https://i.imgur.com/RpVUXji.png',
+      imageUrl: 'https://rewards-bot-images.s3.amazonaws.com/help.png',
+      onClick: {
+        openLink: {
+          url: 'https://rewards-bot-images.s3.amazonaws.com/help.png',
+        },
+      },
       altText: 'check-available-features',
     },
   };

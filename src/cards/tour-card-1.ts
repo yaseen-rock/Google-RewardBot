@@ -13,7 +13,13 @@ export function tourCard1() {
 
   const imageWidget = {
     image: {
-      imageUrl: 'https://i.imgur.com/MtZwitR.png',
+      imageUrl:
+        'https://rewards-bot-images.s3.amazonaws.com/rewards-command.png',
+      onClick: {
+        openLink: {
+          url: 'https://rewards-bot-images.s3.amazonaws.com/rewards-command.png',
+        },
+      },
       altText: 'send-rewards-to-peers',
     },
   };

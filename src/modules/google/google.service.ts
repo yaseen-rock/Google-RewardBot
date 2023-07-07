@@ -50,6 +50,28 @@ export class GoogleService {
     return authClient;
   }
 
+  async createMessage(msg) {
+    let chatScope = [
+      'https://www.googleapis.com/auth/chat.bot',
+      'https://www.googleapis.com/auth/chat.messages',
+    ];
+    const auth = await this.authorize(chatScope);
+
+    const chat = google.chat({ version: 'v1', auth });
+
+    try {
+      let data = await chat.spaces.messages.create({
+        parent: 'spaces/t8FqEUAAAAE',
+        requestBody: { text: msg },
+      });
+      console.log(data);
+      return { message: 'message created' };
+    } catch (error) {
+      console.log(error);
+      return { message: 'Failed to create message' };
+    }
+  }
+
   async deleteMessage(messageId) {
     let chatScope = [
       'https://www.googleapis.com/auth/chat.bot',
@@ -61,7 +83,7 @@ export class GoogleService {
 
     // let createMessageResponse = await chat.message.create({});
     let data = await chat.spaces.messages.delete({
-      name: messageId,
+      name: 'spaces/t8FqEUAAAAE/messages/QUsOPEzjSZ0.QUsOPEzjSZ0',
     });
     console.log(data);
   }
