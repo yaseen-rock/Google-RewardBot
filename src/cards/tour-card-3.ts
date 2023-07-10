@@ -40,7 +40,7 @@ export function tourCard3() {
           },
           onClick: {
             openLink: {
-              url: 'https://www.loom.com/share/198b505b48194ff5aee70488b9a3dc17?sid=5400e2cb-5f50-4ebd-b54c-7a0303ba39c3',
+              url: 'https://www.loom.com/share/018b78dae979405490e2749c11ada298?sid=ffaa35d9-b83c-4a20-865b-b539ffcb1cb5',
               openAs: 'OVERLAY',
               onClose: 'NOTHING',
             },
