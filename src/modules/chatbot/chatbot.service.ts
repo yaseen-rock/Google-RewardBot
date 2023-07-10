@@ -67,11 +67,12 @@ export class ChatbotService {
       _id: req.body.space.name,
     });
     if (!space) {
-      let space = req.body.space;
+      let spaceDetails = req.body.space;
       let type =
-        space.spaceType == 'SPACE' && space.type == 'ROOM'
+        spaceDetails.spaceType == 'SPACE' && spaceDetails.type == 'ROOM'
           ? 'Space'
-          : space.spaceType == 'DIRECT_MESSAGE' && space.type == 'ROOM'
+          : spaceDetails.spaceType == 'DIRECT_MESSAGE' &&
+            spaceDetails.type == 'ROOM'
           ? 'Group Chat'
           : 'DM';
       let data = {
@@ -86,6 +87,8 @@ export class ChatbotService {
         _id: req.body.space.name,
       });
     }
+
+    console.log(space);
     await this._googleService.getSpaceMembers(req.body.space.name);
 
     let card: any = welcomeCard();
