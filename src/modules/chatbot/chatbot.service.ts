@@ -19,6 +19,7 @@ import { tourCard4 } from 'src/cards/tour-card-4';
 import { getUserFeedbackCard as getUserFeedbackDialog } from 'src/cards/get-user-feedback-dialog';
 import { getThanksMessageDialog } from 'src/cards/get-thanks-message-dialog';
 import { FeedbackService } from '../feedback/feedback.service';
+import { AnalyticsService } from '../google_analytics/analytics.service';
 
 @Injectable()
 export class ChatbotService {
@@ -28,6 +29,7 @@ export class ChatbotService {
     private _userService: UserService,
     private _feedbackService: FeedbackService,
     private _rollbarLogger: RollbarLogger,
+    private _analyticsService: AnalyticsService,
   ) {}
   async getResponse(req, res) {
     let data;
@@ -103,19 +105,25 @@ export class ChatbotService {
     let { type, message } = req.body;
     const spaceType = req.body.space.type;
     const sender = message.sender.displayName;
+    const senderEmail = message.sender.email;
+    const currentTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+
     switch (parseInt(message.slashCommand.commandId)) {
       case 1: // /mypoint
-        if (spaceType == 'DM') {
+        if (spaceType === 'DM') {
           data = await this.getUserRewardPoint(sender);
+          await this._analyticsService.trackEvent('mypoint_command', { sender, senderEmail, currentTime });
         } else {
           data = addToChatCard();
         }
         break;
       case 2: // /help
         data = helpCard();
+        await this._analyticsService.trackEvent('help_command', { sender, senderEmail, currentTime });
         break;
       case 3: //redeem
         data = redeemText();
+        await this._analyticsService.trackEvent('redeem_command', { sender, senderEmail, currentTime });
         break;
       default:
         data = noSlashCommandText();
@@ -138,6 +146,14 @@ export class ChatbotService {
         const sender = req.body.message.sender.displayName;
         const image = req.body.message.sender.avatarUrl;
         const text = req.body.message.argumentText;
+        const senderEmail = req.body.message.sender.email;
+        await this._analyticsService.trackEvent('rewards_command', {
+          sender,
+          senderEmail,
+          rewardPoints: this.getRewardPoint(text),
+          receiver: this.getReceiver(text),
+          message: this.extractMessageText(text),
+        });
         data = this.createMessage(text, sender);
       } else {
         data = {
@@ -148,6 +164,11 @@ export class ChatbotService {
       data = validationText();
     }
     return data;
+  }
+  extractMessageText(text) {
+    const regex = /\+\d+\s*@(\w+(\s+\w+))\b/;
+    const cleanText = text.replace(regex, '').trim();
+    return cleanText;
   }
 
   createMessage(text, sender) {
