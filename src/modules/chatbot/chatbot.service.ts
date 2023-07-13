@@ -20,6 +20,7 @@ import { getUserFeedbackCard as getUserFeedbackDialog } from 'src/cards/get-user
 import { getThanksMessageDialog } from 'src/cards/get-thanks-message-dialog';
 import { FeedbackService } from '../feedback/feedback.service';
 import { AnalyticsService } from '../google_analytics/analytics.service';
+import { RewardsLogService } from '../rewardslog_db/rewardsLog.service';
 
 @Injectable()
 export class ChatbotService {
@@ -30,6 +31,7 @@ export class ChatbotService {
     private _feedbackService: FeedbackService,
     private _rollbarLogger: RollbarLogger,
     private _analyticsService: AnalyticsService,
+    private _rewardsLogService: RewardsLogService,
   ) {}
   async getResponse(req, res) {
     let data;
@@ -154,6 +156,8 @@ export class ChatbotService {
           receiver: this.getReceiver(text),
           message: this.extractMessageText(text),
         });
+        await this.saveRewardsLog(senderEmail, this.getReceiver(text), this.getRewardPoint(text), this.extractMessageText(text));
+
         data = this.createMessage(text, sender);
       } else {
         data = {
@@ -165,6 +169,22 @@ export class ChatbotService {
     }
     return data;
   }
+  async saveRewardsLog(senderEmail: string, receiverEmail: string, rewardPoint: number, message: string) {
+    const rewardsLog = {
+      senderEmail,
+      receiverEmail,
+      rewardPoint,
+      message,
+    };
+  
+    try {
+      const createdLog = await this._rewardsLogService.create(rewardsLog);
+      console.log('Rewards Log saved:', createdLog);
+    } catch (error) {
+      console.error('Error saving Rewards Log:', error);
+    }
+  }
+  
   extractMessageText(text) {
     const regex = /\+\d+\s*@(\w+(\s+\w+))\b/;
     const cleanText = text.replace(regex, '').trim();

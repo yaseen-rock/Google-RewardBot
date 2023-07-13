@@ -12,6 +12,7 @@ import { UserModule } from './modules/user/user.module';
 import { GoogleModule } from './modules/google/google.module';
 import { SharedModule } from './shared/shared.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { RewardsLogModule } from './modules/rewardslog_db/rewardsLog.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
     GoogleModule,
     SharedModule,
     FeedbackModule,
+    RewardsLogModule,
   ],
   controllers: [AppController, ChatbotController],
   providers: [AppService],
