@@ -139,25 +139,32 @@ export class ChatbotService {
     let { message } = req.body;
     if (this.isValidRewardMessage(message.argumentText)) {
       let messageId = message.name;
-
+  
       //await this._googleService.deleteMessage(messageId);
-
+  
       const response = await this.calculateRewardPoint(req);
-
+  
       if (!response?.error) {
         const sender = req.body.message.sender.displayName;
-        const image = req.body.message.sender.avatarUrl;
-        const text = req.body.message.argumentText;
         const senderEmail = req.body.message.sender.email;
+        const text = req.body.message.argumentText;
+        const receiverName = this.getReceiver(text);
+        const rewardPoints= this.getRewardPoint(text);
+        const message= this.extractMessageText(text);
+        
+        
+        const receiver = await this._userService.findOne({ displayName: receiverName });
+        const receiverEmail = receiver ? receiver.email : null;
+  
         await this._analyticsService.trackEvent('rewards_command', {
           sender,
           senderEmail,
-          rewardPoints: this.getRewardPoint(text),
           receiver: this.getReceiver(text),
-          message: this.extractMessageText(text),
+          rewardPoints,
+          message,
         });
-        await this.saveRewardsLog(senderEmail, this.getReceiver(text), this.getRewardPoint(text), this.extractMessageText(text));
-
+        await this.saveRewardsLog(senderEmail, receiverEmail, rewardPoints , message);
+  
         data = this.createMessage(text, sender);
       } else {
         data = {
@@ -169,6 +176,7 @@ export class ChatbotService {
     }
     return data;
   }
+  
   async saveRewardsLog(senderEmail: string, receiverEmail: string, rewardPoint: number, message: string) {
     const rewardsLog = {
       senderEmail,
@@ -179,7 +187,7 @@ export class ChatbotService {
   
     try {
       const createdLog = await this._rewardsLogService.create(rewardsLog);
-      console.log('Rewards Log saved:', createdLog);
+      console.log('Rewards Log saved in MongoDB:', createdLog);
     } catch (error) {
       console.error('Error saving Rewards Log:', error);
     }
