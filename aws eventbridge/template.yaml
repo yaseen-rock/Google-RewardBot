@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Update rewards points of every user to 100 on 1st of every month'
+
+Resources:
+  EventBridgeRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: 'MonthlyUpdateRule'
+      ScheduleExpression: 'cron(0 0 1 * ? *)' # Trigger on the 1st day of every month at 00:00 UTC
+      State: 'ENABLED'
+
+  MonthlyUpdateFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: .
+      Handler: index.handler
+      Runtime: nodejs14.x 
+      Events:
+        MonthlyUpdateEvent:
+          Type: 'CloudWatchEvent'
+          Properties:
+            Pattern:
+              source:
+                - 'aws.events'
+              detail-type:
+                - 'Scheduled Event'
+              detail:
+                resources:
+                  - !Ref EventBridgeRule
